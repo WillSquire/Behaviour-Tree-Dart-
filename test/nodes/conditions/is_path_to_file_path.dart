@@ -4,7 +4,7 @@ class IsPathToFilePath implements Condition {
 
   String filePath = 'path/to/file';
 
-  bool process(dynamic blackboard) {
+  bool process(Map<String, dynamic> blackboard) {
 
     if (blackboard['path'] == filePath) {
       return true;

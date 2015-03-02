@@ -6,19 +6,31 @@ library behaviour_tree.test;
 import 'package:unittest/unittest.dart';
 import 'package:behaviour_tree/behaviour_tree.dart';
 
-// Nodes
-part 'nodes/has_path.dart';
-part 'nodes/is_path_to_file_path.dart';
+/**
+ * Nodes
+ */
+// Actions
+part 'nodes/actions/set_path_path_to_file.dart';
 
-// Tress
-part 'trees/router_tree.dart';
+// Conditions
+part 'nodes/conditions/has_path.dart';
+part 'nodes/conditions/is_path_to_file_path.dart';
+
+/**
+ * Trees
+ */
+// Sequences
+part 'trees/sequences/router_sequence.dart';
+
+// Selectors
+part 'trees/selectors/route_selector.dart';
 
 main() {
 
   /**
-   * Conditions test
+   * Condition test
    */
-  group('Conditions', () {
+  group('Condition', () {
 
     test('Has variable', () {
 
@@ -33,25 +45,71 @@ main() {
     });
   });
 
-  group('A group of tests', () {
+  /**
+   * Action test
+   */
+  group('Action', () {
 
-    RouterTree routeTree;
+    Map<String, dynamic> blackboard = new Map<String, dynamic>();
+
+    test('Set variable', () {
+
+      expect(new SetPathPathToFile().process(blackboard), isTrue);
+
+    });
+
+    test('Check if variable was set', () {
+
+      expect(new SetPathPathToFile().process(blackboard), isTrue);
+
+    });
+  });
+
+  /**
+   * Sequence test
+   */
+  group('Sequence', () {
+
+    Map<String, dynamic> blackboard;
 
     setUp(() {
 
-      routeTree = new RouterTree();
+      blackboard = {
+          'path' : 'path/to/file'
+      };
+
+    });
+
+    test('Successful sequence', () {
+
+      expect(new RouterSequence().process(blackboard), isTrue);
+
+    });
+
+  });
+
+  /**
+   * Selector test
+   */
+  /*
+  group('Sequence', () {
+
+    Map<String, dynamic> blackboard;
+
+    setUp(() {
+
+      blackboard = {
+          'path' : 'path/to/file'
+      };
 
     });
 
     test('First Test', () {
 
-      Object blackboard = {
-          'path' : 'path/to/file'
-      };
-
-      expect(routeTree.process(blackboard), isTrue);
+      expect(new RouteSelector().process(blackboard), isTrue);
 
     });
   });
+  */
 
 }

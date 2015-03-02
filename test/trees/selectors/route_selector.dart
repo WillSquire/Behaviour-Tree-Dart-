@@ -1,6 +1,6 @@
 part of behaviour_tree.test;
 
-class RouterTree extends Sequence {
+class RouteSelector extends Selector {
 
   List<Node> nodes = [
       new HasPath(),

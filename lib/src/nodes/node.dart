@@ -3,10 +3,10 @@ part of behaviour_tree.base;
 abstract class Node {
 
   /**
-   * Takes the blackboard entity on each process. Where as in an AI system
+   * Takes a blackboard entity on each process. Where in most AI systems
    * this would generally be passed upon initialisation and remain constant,
-   * here the data is associated with only with only the current processing,
-   * not a constant source.
+   * here the node can be associated with multiplicity of sources, to have
+   * one instance work on multiple problem domains.
    */
   bool process(dynamic blackboard);
 
