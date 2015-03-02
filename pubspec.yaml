@@ -1,7 +1,7 @@
 name: behaviour_tree
 description: >
-  A library useful for applications or for sharing on pub.dartlang.org.
-version: 0.8.0
+  A behaviour tree library for Dart.
+version: 0.8.1
 author: Will Squire <will.mj.squire@googlemail.com>
 homepage: https://twitter.com/WillSquire
 #dependencies:
