@@ -1,6 +1,6 @@
 part of behaviour_tree.test;
 
-class SetPathPathToFile implements Action {
+class SetPathPathToFileSync implements ActionSync {
 
   bool process(Map<String, dynamic> blackboard) {
 

@@ -1,6 +1,6 @@
 part of behaviour_tree.test;
 
-class HasPath implements Condition {
+class HasPathSync implements ConditionSync {
 
   bool process(Map<String, dynamic> blackboard) {
 

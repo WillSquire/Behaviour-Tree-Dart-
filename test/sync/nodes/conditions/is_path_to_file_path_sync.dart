@@ -1,6 +1,6 @@
 part of behaviour_tree.test;
 
-class IsPathToFilePath implements Condition {
+class IsPathToFilePathSync implements ConditionSync {
 
   String filePath = 'path/to/file';
 

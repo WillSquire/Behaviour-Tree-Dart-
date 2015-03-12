@@ -5,111 +5,46 @@ library behaviour_tree.test;
 
 import 'package:unittest/unittest.dart';
 import 'package:behaviour_tree/behaviour_tree.dart';
+import 'dart:async';
 
 /**
- * Nodes
+ * Sync Nodes
  */
 // Actions
-part 'nodes/actions/set_path_path_to_file.dart';
+part 'sync/nodes/actions/set_path_path_to_file_sync.dart';
 
 // Conditions
-part 'nodes/conditions/has_path.dart';
-part 'nodes/conditions/is_path_to_file_path.dart';
+part 'sync/nodes/conditions/has_path_sync.dart';
+part 'sync/nodes/conditions/is_path_to_file_path_sync.dart';
 
 /**
  * Trees
  */
 // Sequences
-part 'trees/sequences/router_sequence.dart';
+part 'sync/trees/sequences/router_sequence_sync.dart';
 
 // Selectors
-part 'trees/selectors/route_selector.dart';
+part 'sync/trees/selectors/route_selector_sync.dart';
+
+/**
+ * Async Nodes
+ */
+// Conditions
+part 'async/nodes/conditions/has_path.dart';
+part 'async/nodes/conditions/is_path_index.dart';
+part 'async/nodes/conditions/is_path_user.dart';
+
+/**
+ * Tests
+ */
+part 'condition_test.dart';
+part 'action_test.dart';
+part 'selector_test.dart';
+part 'sequence_test.dart';
 
 main() {
-
-  /**
-   * Condition test
-   */
-  group('Condition', () {
-
-    test('Has variable', () {
-
-      expect(new HasPath().process({'path' : 'path/to/file'}), isTrue);
-
-    });
-
-    test('Does not have variable', () {
-
-      expect(new HasPath().process({'other' : 'path/to/file'}), isFalse);
-
-    });
-  });
-
-  /**
-   * Action test
-   */
-  group('Action', () {
-
-    Map<String, dynamic> blackboard = new Map<String, dynamic>();
-
-    test('Set variable', () {
-
-      expect(new SetPathPathToFile().process(blackboard), isTrue);
-
-    });
-
-    test('Check if variable was set', () {
-
-      expect(new SetPathPathToFile().process(blackboard), isTrue);
-
-    });
-  });
-
-  /**
-   * Sequence test
-   */
-  group('Sequence', () {
-
-    Map<String, dynamic> blackboard;
-
-    setUp(() {
-
-      blackboard = {
-          'path' : 'path/to/file'
-      };
-
-    });
-
-    test('Successful sequence', () {
-
-      expect(new RouterSequence().process(blackboard), isTrue);
-
-    });
-
-  });
-
-  /**
-   * Selector test
-   */
-  /*
-  group('Sequence', () {
-
-    Map<String, dynamic> blackboard;
-
-    setUp(() {
-
-      blackboard = {
-          'path' : 'path/to/file'
-      };
-
-    });
-
-    test('First Test', () {
-
-      expect(new RouteSelector().process(blackboard), isTrue);
-
-    });
-  });
-  */
-
+  condition_test();
+  action_test();
+  selector_test();
+  sequence_test();
 }

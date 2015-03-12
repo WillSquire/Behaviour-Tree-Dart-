@@ -1,14 +1,14 @@
-part of behaviour_tree.base;
+part of behaviour_tree_sync;
 
 /**
  * Returns true if any node in the sequence returns true,
  * and false if the sequence is completed.
  */
-abstract class Selector extends Tree {
+abstract class SelectorSync extends TreeSync {
 
   bool process(dynamic blackboard) {
 
-    nodes.forEach((Node node) {
+    nodes.forEach((NodeSync node) {
 
       if (node.process(blackboard))
         return true;

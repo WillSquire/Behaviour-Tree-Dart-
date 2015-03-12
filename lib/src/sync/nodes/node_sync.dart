@@ -1,6 +1,6 @@
-part of behaviour_tree.base;
+part of behaviour_tree_sync;
 
-abstract class Node {
+abstract class NodeSync {
 
   /**
    * Takes a blackboard entity on each process. Where in most AI systems
