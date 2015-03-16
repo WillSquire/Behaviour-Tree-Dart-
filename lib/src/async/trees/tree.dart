@@ -8,6 +8,6 @@ abstract class Tree<T> extends Node<T> {
 
   List<Node<T>> nodes;
 
-  Tree.WithNodes(this.nodes);
+  Tree([this.nodes]);
 
 }

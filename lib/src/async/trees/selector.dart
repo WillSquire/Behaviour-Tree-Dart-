@@ -6,7 +6,7 @@ part of behaviour_tree_async;
  */
 class Selector<T> extends Tree<T> {
 
-  Selector.WithNodes(List<Node<T>> nodes) : super.WithNodes(nodes);
+  Selector([List<Node<T>> nodes]) : super(nodes);
 
   Future<bool> process(T blackboard) {
 

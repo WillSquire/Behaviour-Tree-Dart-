@@ -37,7 +37,7 @@ selector_test() {
     Selector select;
 
     setUp(() {
-      select = new Selector.WithNodes([
+      select = new Selector([
           new IsPathIndex(),
           new IsPathUser()
       ]);

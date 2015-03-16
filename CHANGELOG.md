@@ -1,6 +1,12 @@
 behaviour_tree
 --------------
 
+v0.9.1
+======
+- Changed Tree class to no longer use a named constructor for 
+instantiating with nodes, instead it takes an option parameter (and 
+still uses a default constructor in inheritance usages).
+
 v0.9.0
 ======
 - Added async library, replacing all the previous components with

@@ -6,7 +6,7 @@ part of behaviour_tree_async;
  */
 class Sequence<T> extends Tree<T> {
 
-  Sequence.WithNodes(List<Node<T>> nodes) : super.WithNodes(nodes);
+  Sequence([List<Node<T>> nodes]) : super(nodes);
 
   Future<bool> process(T blackboard) {
 

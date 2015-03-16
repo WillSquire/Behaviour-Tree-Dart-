@@ -26,7 +26,7 @@ sequence_test() {
     Sequence sequence;
 
     setUp(() {
-      sequence = new Sequence.WithNodes([
+      sequence = new Sequence([
           new HasPath(),
           new IsPathIndex(),
           new IsPathUser()
