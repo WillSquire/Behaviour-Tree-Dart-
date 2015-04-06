@@ -34,20 +34,42 @@ selector_test() {
    */
   group('Selector', () {
 
-    Selector select;
+    Selector selector;
+    Selector selector_injected;
 
     setUp(() {
-      select = new Selector([
+      // Encapsulated
+      selector = new Route();
+
+      // Injected
+      selector_injected = new Selector([
           new IsPathIndex(),
-          new IsPathUser()
+          new IsPathUser(),
+          new Node((blackboard) {
+            if (blackboard['path'] == '404')
+              return new Future(() => true);
+
+            return new Future(() => false);
+          }),
+          new Node((blackboard) {
+            if (blackboard['noPath'] == 'somePath')
+              return new Future(() => true);
+
+            return new Future(() => false);
+          })
       ]);
     });
 
-    test('Returns', () {
-      select.process({'doesntHavePath' : 'No'}).then((bool value) { expect(value, isFalse); });
-      select.process({'path' : 'index'}).then((bool value) { expect(value, isTrue); });
-      select.process({'path' : 'user'}).then((bool value) { expect(value, isTrue); });
-      select.process({'path' : '404'}).then((bool value) { expect(value, isFalse); });
+    test('Selector completed selection with encapsulated implementation', () {
+      return selector.process({'path' : 'index'}).then((bool value) { expect(value, isTrue); });
+    });
+
+    test('Selector completed selection with injected implementation', () {
+      return selector_injected.process({'path' : 'index'}).then((bool value) { expect(value, isTrue); });
+    });
+
+    test('Selector failed selection', () {
+      return selector.process({'doesntHavePath' : 'No'}).then((bool value) { expect(value, isFalse); });
     });
 
   });

@@ -24,20 +24,41 @@ sequence_test() {
   group('Sequence', () {
 
     Sequence sequence;
+    Sequence sequence_injected;
 
     setUp(() {
-      sequence = new Sequence([
+      // Encapsulated
+      sequence = new CheckLoggedIn();
+
+      // Injected
+      sequence_injected = new Sequence([
           new HasPath(),
           new IsPathIndex(),
-          new IsPathUser()
+          new Node((blackboard) {
+            if (blackboard['isLoggedIn'] != null)
+              return new Future(() => true);
+
+            return new Future(() => false);
+          }),
+          new Node((blackboard) {
+            if (blackboard['isLoggedIn'] == true)
+              return new Future(() => true);
+
+            return new Future(() => false);
+          })
       ]);
     });
 
-    test('Returns', () {
-      sequence.process({'doesntHavePath' : 'No'}).then((bool value) { expect(value, isFalse); });
-      sequence.process({'path' : 'index'}).then((bool value) { expect(value, isTrue); });
-      sequence.process({'path' : 'user'}).then((bool value) { expect(value, isTrue); });
-      sequence.process({'path' : '404'}).then((bool value) { expect(value, isFalse); });
+    test('Sequence failed completion with encapsulated implementation', () {
+      return sequence.process({'path' : 'index'}).then((bool value) { expect(value, isFalse); });
+    });
+
+    test('Sequence failed completion with injected implementation', () {
+      return sequence_injected.process({'path' : 'index'}).then((bool value) { expect(value, isFalse); });
+    });
+
+    test('Sequence completed sequence', () {
+      return sequence.process({'path' : 'index', 'isLoggedIn' : true }).then((bool value) { expect(value, isTrue); });
     });
 
   });

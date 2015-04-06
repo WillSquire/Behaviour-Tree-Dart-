@@ -4,10 +4,12 @@ import 'dart:async';
 
 // Nodes
 part 'nodes/node.dart';
+part 'nodes/_node.dart';
 part 'nodes/action.dart';
 part 'nodes/condition.dart';
 
-// Trees
-part 'trees/tree.dart';
-part 'trees/sequence.dart';
-part 'trees/selector.dart';
+// Composites
+part 'composites/composite.dart';
+//part 'composites/_composite.dart';
+part 'composites/sequence.dart';
+part 'composites/selector.dart';

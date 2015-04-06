@@ -4,14 +4,24 @@ part of behaviour_tree_async;
  * Returns false if any node in the sequence returns false,
  * and true if the sequence is completed.
  */
-class Sequence<T> extends Tree<T> {
+class Sequence<T> implements Composite<T> {
 
-  Sequence([List<Node<T>> nodes]) : super(nodes);
+  List<Node<T>> nodes;
 
-  Future<bool> process(T blackboard) {
+  Sequence(List<Node<T>> this.nodes);
 
-    return _sequence(blackboard);
+  Future<bool> process(T blackboard) async {
+
+    for(Node node in nodes) {
+      if (!await node.process(blackboard))
+        return new Future(() => false);
+    }
+
+    return new Future(() => true);
   }
+
+  /*
+  * Old way
 
   /**
    * Recursively iterates through the node array.
@@ -46,4 +56,5 @@ class Sequence<T> extends Tree<T> {
 
     return completer.future;
   }
+  */
 }
