@@ -1,5 +1,5 @@
 name: behaviour_tree
-version: 0.9.2
+version: 0.9.5
 author: Will Squire <will.mj.squire@googlemail.com>
 description: A behaviour tree library for Dart.
 homepage: https://twitter.com/WillSquire

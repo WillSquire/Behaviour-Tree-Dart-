@@ -1,7 +1,20 @@
 behaviour_tree
 --------------
 
-v0.9.1
+v0.9.5
+======
+- Added decorator class and the inverter sub class, along with its 
+documentation.
+
+v0.9.4
+======
+- Added action and condition documentation.
+
+v0.9.3
+======
+- Added syntax highlighting for documentation.
+
+v0.9.2
 ======
 - Changed most files (async only). Added encapsulated and decapsulated approaches for 
 implementing/extending classes (allowing injection of logic into default classes).

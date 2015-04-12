@@ -10,7 +10,7 @@ typedef Future<bool> Process<B>(B blackboard);
  */
 abstract class Node<T> {
 
-  factory Node(Process<T> implementation) => new _Node(implementation);
+  factory Node(Process<T> implementation) => new _Node<T>(implementation);
 
   Future<bool> process(T blackboard);
 

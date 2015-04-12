@@ -47,6 +47,7 @@ part 'async/composites/selectors/route.dart';
  * Tests
  */
 part 'node_test.dart';
+part 'inverter_test.dart';
 part 'condition_test.dart';
 part 'action_test.dart';
 part 'selector_test.dart';
@@ -54,6 +55,7 @@ part 'sequence_test.dart';
 
 main() {
   node_test();
+  inverter_test();
   condition_test();
   action_test();
   selector_test();

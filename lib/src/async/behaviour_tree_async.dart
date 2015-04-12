@@ -8,6 +8,10 @@ part 'nodes/_node.dart';
 part 'nodes/action.dart';
 part 'nodes/condition.dart';
 
+// Decorators
+part 'decorators/decorator.dart';
+part 'decorators/inverter.dart';
+
 // Composites
 part 'composites/composite.dart';
 //part 'composites/_composite.dart';

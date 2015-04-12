@@ -2,9 +2,9 @@ behaviour_tree
 --------------
 The Behaviour Tree framework is a foundation for the classic design pattern structure, often associated
 with the field of AI (artificial intelligence) and used predominantly within the games industry. These
-frameworks are a solution to systems that have complex logical infrastructures and have 
-similar structure to neural networks but with discrete responses rather than probability 
-(fuzzy logic).
+frameworks are a solution to systems that have complex logical infrastructures and have the
+similar node based structure that neural networks have, but return discrete boolean responses, rather than probability 
+(floats - fuzzy logic).
 
 This behaviour tree library contains the foundations for building behaviour tree systems.
 
@@ -15,6 +15,8 @@ The library components and inheritance hierarchy:
 - Node
     - Action
     - Condition
+    - Decorator
+        - Inverter
     - Composite
         - Selector
         - Sequence
@@ -50,6 +52,33 @@ The blackboard, or problem domain, is worked on collectively by each node the tr
 comprises of, to break down the problem into 'sub-problems' that are each resolved 
 by specific nodes, which reach a solution for the overall system.
 
+#### Action
+Actions by the conventions of their name are the nodes that carry out change upon the problem domain. Actions will nearly always 
+return true unless something prevented the action from taking place. Before an action is carried out however, the blackboard can be queried to determine if it has the
+correct conditions to incur that change. This is what conditions are used for.
+
+In this framework, the action class is included with no added functionality over the node class. It's purely to
+distinguish its purpose rather than directly incur functional difference at this current time. 
+
+#### Condition
+Conditions by convention of their name do not carry out any change on the problem domain. Conditions are nodes that
+query the problem domain to check if it meets certain criteria, returning true or false. These nodes help indirectly control the flow of the behaviour tree
+through their output when used in conjunction with composite nodes.
+
+In this framework, the condition class is included with no added functionality over the node class. It's purely to
+distinguish its purpose rather than directly incur functional difference at this current time.
+
+### Decorator
+The decorator node (or wrapper node) is a node that contains or 'wraps' another node inside itself,
+extending the contained node's functionality without altering its encapsulated implementation or
+building a new class.
+
+#### Inverter
+The inverter decorator inverts the response given by a node contained within it, returning true if the contained node returned false, and vice versa.
+If conditions follow the 'is' true convention, i.e. all the conditions check if something 'is' working or a property 'is' present, rather than 'is not', then
+when-ever a condition needs to find out if something 'is not' true, it can simply be wrapped in this inverter decorator rather than creating an additional class 
+for checking when it 'is not' true.
+
 ### Composite
 Composite nodes (also know as the control flow nodes, or a branch) are nodes that contain an array of nodes within 
 themselves, along with the logic behind how these encapsulated nodes should be executed. As such,
@@ -71,13 +100,12 @@ Features
 ### Optionally Typed
 This framework has be built with the option of specifying a type for the 
 blackboard object in mind to reduce errors. This is optional, and will of course
-fall back to the `dynamic` type if not set as specified by the language. 
+fall back to the `dynamic` type by default if not set, as specified by the language. 
 
-The tree's component interface defines a `dynamic` type for the 'blackboard' parameter. 
-With this interface, the components can define their own function's parameters,
-such as `Map<String, dynamic>`, if suitable.
- 
-This helps keep the package as flexible as possible.
+All node classes have the option of explicitly specifying the blackboard type through generics via the class instantiation, i.e. `new Node<Map<String, dynamic>>`.
+With this interface, the components can define their own function's parameter type,
+such as `Map<String, dynamic>`, if suitable. Doing it this way helps keep the package as flexible as possible, whilst allowing explicit typing for the 
+tree if required for the particular tree.
 
 ### Encapsulated vs Decapsulated Dependency
 For clarification in this context, encapsulated dependency here will refer to anything defined 
@@ -114,33 +142,64 @@ This example defines a new node as a new class, and is the best approach to use 
 By encapsulating the logic in the class, it makes the node reusable, but takes a little longer
 to set up.
 
-    class HasPath implements Node {
+```dart
+
+class HasPath implements Node {
+
+  // Every implementation of Node must have the process function,
+  // which executes all of the nodes processing logic
+  Future<bool> process(Map<String, dynamic> blackboard) {
+
+    // Carry out the logic that must return a Boolean (wrapped in 
+    // a future as this is an asynchronous framework by nature).
+    if (blackboard['path'] != null)
+      return new Future(() => true);
     
-      // Every implementation of Node must have the process function,
-      // which executes all of the nodes processing logic
-      Future<bool> process(Map<String, dynamic> blackboard) {
+    return new Future(() => false);
+  }
+
+}
     
-        // Carry out the logic that must return a Boolean (wrapped in 
-        // a future as this is an asynchronous framework by nature).
-        if (blackboard['path'] != null)
-          return new Future(() => true);
-        
-        return new Future(() => false);
-      }
-    
-    }
+```
 
 This next example creates a node from the base object, injecting the functionality. By
 using the decapsulated approach, code can be tested much faster as a new class does not
 need to be defined, however this is not a reusable pattern and is only good for testing or
 for code that will only be used once.
 
-    new Node((blackboard) {
-      if (blackboard['isLoggedIn'] != null)
-        return new Future(() => true);
+```dart
+
+new Node((blackboard) {
+  if (blackboard['isLoggedIn'] != null)
+    return new Future(() => true);
+
+  return new Future(() => false);
+})
     
-      return new Future(() => false);
-    })
+```
+
+### Decorator
+Decorator nodes generally won't need to be extended, as such, just the decapsulated implementation will be exemplified. If one were to encapsulated new functionality by extending the class, it
+might be considered as an anti pattern as decorators simply extend the functionality of existing nodes, thus the nodes
+could be extended themselves if implementation is to be encapsulated into a new class.
+
+#### Inverter
+To wrap a node in the inverter (to invert the process response):
+
+```dart
+
+// Instantiating node class and inverting result
+new Inverter(new IsPathIndex());
+
+// Or by instantiating base node class, injecting logic and inverting result
+new Inverter(new Node((blackboard) {
+  if (blackboard['isLoggedIn'] == true)
+    return new Future(() => true);
+
+  return new Future(() => false);
+}));
+
+```
     
 ### Composite
 For the composite nodes, again there is both an encapsulation approach or decapsulation approach. 
@@ -151,104 +210,120 @@ to the composite itself wouldn't be the best approach).
 #### Sequence
 The encapsulated approach for a sequence:
 
-    class CheckLoggedIn<T> extends Sequence<T> {
+```dart
+
+class CheckLoggedIn<T> extends Sequence<T> {
+
+  // Acting as a wrapper for the sequence constructor, simply pass the nodes 
+  // to the parent constructor in the new class's constructor
+  CheckLoggedIn() : super([
+      // Instantiating node classes
+      new HasPath(),
+      new IsPathIndex(),
+
+      // Instantiating base node class and injecting logic
+      new Node((blackboard) {
+        if (blackboard['isLoggedIn'] != null)
+          return new Future(() => true);
+
+        return new Future(() => false);
+      }),
+      new Node((blackboard) {
+        if (blackboard['isLoggedIn'] == true)
+          return new Future(() => true);
+
+        return new Future(() => false);
+      })
+  ]);
+
+}
     
-      // Acting as a wrapper for the sequence constructor, simply pass the nodes 
-      // to the parent constructor in the new class's constructor
-      CheckLoggedIn() : super([
-          // Instantiating node classes
-          new HasPath(),
-          new IsPathIndex(),
-    
-          // Instantiating base node class and injecting logic
-          new Node((blackboard) {
-            if (blackboard['isLoggedIn'] != null)
-              return new Future(() => true);
-    
-            return new Future(() => false);
-          }),
-          new Node((blackboard) {
-            if (blackboard['isLoggedIn'] == true)
-              return new Future(() => true);
-    
-            return new Future(() => false);
-          })
-      ]);
-    
-    }
+```
 
 And the decapsulated approach:
 
-    new Sequence([
-        // Instantiating node classes
-        new HasPath(),
-        new IsPathIndex(),
-        
-        // Instantiating base node class and injecting logic
-        new Node((blackboard) {
-          if (blackboard['isLoggedIn'] != null)
-            return new Future(() => true);
+```dart
+
+new Sequence([
+    // Instantiating node classes
+    new HasPath(),
+    new IsPathIndex(),
     
-          return new Future(() => false);
-        }),
-        new Node((blackboard) {
-          if (blackboard['isLoggedIn'] == true)
-            return new Future(() => true);
+    // Instantiating base node class and injecting logic
+    new Node((blackboard) {
+      if (blackboard['isLoggedIn'] != null)
+        return new Future(() => true);
+
+      return new Future(() => false);
+    }),
+    new Node((blackboard) {
+      if (blackboard['isLoggedIn'] == true)
+        return new Future(() => true);
+
+      return new Future(() => false);
+    })
+]);
     
-          return new Future(() => false);
-        })
-    ]);
+```
 
 #### Selector
 The encapsulated approach for a selector:
 
-    class Route<T> extends Selector<T> {
+```dart
+
+class Route<T> extends Selector<T> {
+
+  // Acting as a wrapper for the selector constructor, simply pass the nodes 
+  // to the parent constructor in the new class's constructor
+  Route() : super([
+      // Instantiating node classes
+      new IsPathIndex(),
+      new IsPathUser(),
+
+      // Instantiating base node class and injecting logic
+      new Node((blackboard) {
+        if (blackboard['path'] == '404')
+          return new Future(() => true);
+
+        return new Future(() => false);
+      }),
+      new Node((blackboard) {
+        if (blackboard['noPath'] == 'somePath')
+          return new Future(() => true);
+
+        return new Future(() => false);
+      })
+  ]);
+
+}
     
-      // Acting as a wrapper for the selector constructor, simply pass the nodes 
-      // to the parent constructor in the new class's constructor
-      Route() : super([
-          // Instantiating node classes
-          new IsPathIndex(),
-          new IsPathUser(),
-    
-          // Instantiating base node class and injecting logic
-          new Node((blackboard) {
-            if (blackboard['path'] == '404')
-              return new Future(() => true);
-    
-            return new Future(() => false);
-          }),
-          new Node((blackboard) {
-            if (blackboard['noPath'] == 'somePath')
-              return new Future(() => true);
-    
-            return new Future(() => false);
-          })
-      ]);
-    
-    }
+```
     
 And the decapsulated approach:
 
-    new Selector([
-        // Instantiating node classes
-        new IsPathIndex(),
-        new IsPathUser(),
-        
-        // Instantiating base node class and injecting logic
-        new Node((blackboard) {
-          if (blackboard['path'] == '404')
-            return new Future(() => true);
+```dart
+
+new Selector([
+    // Instantiating node classes
+    new IsPathIndex(),
+    new IsPathUser(),
     
-          return new Future(() => false);
-        }),
-        new Node((blackboard) {
-          if (blackboard['noPath'] == 'somePath')
-            return new Future(() => true);
+    // Instantiating base node class and injecting logic
+    new Node((blackboard) {
+      if (blackboard['path'] == '404')
+        return new Future(() => true);
+
+      return new Future(() => false);
+    }),
+    new Node((blackboard) {
+      if (blackboard['noPath'] == 'somePath')
+        return new Future(() => true);
+
+      return new Future(() => false);
+    })
+]);
     
-          return new Future(() => false);
-        })
-    ]);
+```
 
 Features and bugs
 =================
